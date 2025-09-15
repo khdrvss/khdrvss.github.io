@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Premium Hacker Portfolio</title>
+  <meta name="description" content="Offensive security • Python/Django • OSINT & Automation" />
+  <style>
+    /* ---------------------
+       Base & Theme
+    ---------------------- */
+    :root {
+      --bg: #06080b;
+      --panel: rgba(255,255,255,0.04);
+      --panel-2: rgba(255,255,255,0.06);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.7);
+      --muted-2: rgba(255,255,255,0.55);
+      --border: rgba(255,255,255,0.12);
+      --accent-cyan: #06b6d4; /* cyan-500 */
+      --accent-fuchsia: #a855f7; /* fuchsia-500 */
+      --shadow: 0 0 24px rgba(6, 182, 212, .25);
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    a { color: inherit; text-decoration: none; }
+    /* Background: grid + vignette + scanline */
+    .bgfx {
+      position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    }
+    .bgfx::before{ /* vignette / glow */
+      content:""; position:absolute; inset:0;
+      background: radial-gradient(1000px 600px at 50% -20%, rgba(56,189,248,.22), transparent 60%);
+    }
+    .bgfx::after{ /* grid */
+      content:""; position:absolute; inset:0; opacity:.08;
+      -webkit-mask-image: radial-gradient(ellipse at center, black, transparent 65%);
+              mask-image: radial-gradient(ellipse at center, black, transparent 65%);
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.14) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .scanline{ position:fixed; inset:0; mix-blend: overlay; opacity:.3;
+      background-image: linear-gradient(to bottom, transparent 0, rgba(180,255,255,.08) 2px, transparent 4px);
+      background-size: 100% 8px; animation: scan 6s linear infinite;
+      pointer-events:none; z-index: -1;
+    }
+    @keyframes scan { to { transform: translateY(8px); } }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; backdrop-filter: blur(8px);
+      background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border);
+    }
+    .nav { display:flex; align-items:center; justify-content:space-between; padding: 16px 0; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-logo{ width:32px; height:32px; border-radius:14px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-fuchsia)); box-shadow: 0 0 24px rgba(168,85,247,.35); }
+    .brand-handle{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 14px; color: rgba(255,255,255,.85) }
+    .navlinks { display:none; gap:24px; color: var(--muted); font-size: 14px; }
+    .cta { display:inline-flex; align-items:center; gap:8px; font-size:14px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background: var(--panel); }
+    .cta:hover{ background: var(--panel-2); }
+    @media (min-width: 640px){ .navlinks{ display:flex } }
+
+    /* Sections */
+    section { padding: 56px 0; }
+
+    /* Hero */
+    .hero { display: grid; gap: 24px; align-items: center; }
+    @media (min-width: 900px){ .hero { grid-template-columns: 1fr 1fr; gap: 40px; } }
+    .glitch-wrap { position: relative; display: inline-block; }
+    .glitch-base, .glitch-cyan, .glitch-fuchsia { font-weight: 900; letter-spacing: -0.5px; user-select: none; display:block; }
+    .glitch-base { font-size: clamp(32px, 5vw, 72px); text-shadow: 0 0 16px rgba(0,255,255,.25); }
+    .glitch-cyan, .glitch-fuchsia{ position:absolute; inset:0; mix-blend-mode: screen; }
+    .glitch-cyan{ color: var(--accent-cyan); animation: gl1 2s infinite; }
+    .glitch-fuchsia{ color: var(--accent-fuchsia); animation: gl2 2s infinite; }
+    @keyframes gl1 { 0%{ transform:translate(0,0)} 20%{transform:translate(1px,-1px)} 40%{transform:translate(-1px,1px)} 60%{transform:translate(1px,0)} 80%{transform:translate(0,1px)} 100%{transform:translate(0,0)} }
+    @keyframes gl2 { 0%{ transform:translate(0,0)} 20%{transform:translate(-1px,1px)} 40%{transform:translate(1px,-1px)} 60%{transform:translate(-1px,0)} 80%{transform:translate(0,-1px)} 100%{transform:translate(0,0)} }
+    .location { margin-top: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color: rgba(34,211,238,.9); font-size: 13px; }
+    .headline { margin-top: 12px; font-size: clamp(18px, 2.4vw, 22px); color: rgba(255,255,255,.92); }
+    .bio { margin-top: 12px; color: var(--muted); max-width: 64ch; }
+    .herobtns { margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap; }
+    .btn-primary { padding: 10px 14px; border-radius: 12px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-fuchsia)); box-shadow: var(--shadow); font-weight: 600; }
+    .btn-secondary { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel); }
+    .btn-secondary:hover { background: var(--panel-2); }
+    .socials { margin-top: 16px; display:flex; gap:16px; color: var(--muted); }
+    .icon { width:26px; height:26px; display:inline-block; }
+
+    /* Terminal */
+    .terminal { border:1px solid var(--border); background: rgba(0,0,0,.4); border-radius: 16px; padding: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.35); }
+    .term-title { display:flex; align-items:center; gap:8px; padding-bottom: 10px; }
+    .dot { width:10px; height:10px; border-radius:999px; }
+    .dot.red{ background:#ef4444cc } .dot.yellow{ background:#f59e0bcc } .dot.green{ background:#22c55ecc }
+    pre { margin:0; white-space:pre-wrap; word-wrap:break-word; font-size:13px; line-height:1.6; color: rgba(255,255,255,.92); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .prompt { color: #22d3ee; } .dollar { color: #fff; }
+    .cursor { display:inline-block; width: 10px; height: 16px; background:#fff; animation: blink 1s step-start infinite; vertical-align: middle; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Section headers */
+    .sec-header { display:flex; align-items:end; justify-content:space-between; margin-bottom: 14px; }
+    .muted-tag { font-size:12px; color: var(--muted-2); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    /* Cards */
+    .grid { display:grid; gap: 16px; }
+    @media (min-width: 700px){ .grid.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (min-width: 1024px){ .grid.cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    .card { position:relative; overflow:hidden; border:1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,.05), transparent); border-radius: 16px; padding: 16px; transition: transform .25s ease, border-color .25s ease; }
+    .card:hover{ transform: translateY(-6px); border-color: rgba(34,211,238,.35); }
+    .glow{ position:absolute; inset:-1px; opacity:0; transition:opacity .25s ease; background: radial-gradient(400px 200px at 20% 0%, rgba(34,211,238,.25), transparent); }
+    .card:hover .glow{ opacity:.4 }
+    .card-title { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; font-weight:600; color: rgba(255,255,255,.92); }
+    .card-desc { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .tags { margin-top: 10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .tag { padding: 4px 8px; border:1px solid var(--border); background: var(--panel); border-radius: 999px; font-size: 12px; color: rgba(255,255,255,.75); }
+
+    /* Capability boxes */
+    .cap { border:1px solid var(--border); background: var(--panel); border-radius: 16px; padding: 18px; }
+    .cap-title{ color: rgba(255,255,255,.92); font-weight:600; }
+    .cap ul{ margin:10px 0 0; padding-left: 0; list-style:none; }
+    .cap li{ display:flex; gap:8px; align-items:flex-start; color: rgba(255,255,255,.8); font-size: 14px; }
+    .dot-mini{ margin-top: 7px; width:6px; height:6px; border-radius:999px; background: #22d3ee; }
+
+    /* Contact */
+    .contact { border:1px solid var(--border); background: linear-gradient(135deg, rgba(255,255,255,.05), transparent); border-radius: 16px; padding: 20px; }
+
+    /* Footer */
+    footer { text-align:center; color: var(--muted-2); font-size:12px; padding: 20px 0 40px; }
+
+    /* Utils */
+    .row { display:flex; gap: 12px; align-items:center; }
+    .space { height: 12px; }
+  </style>
+</head>
+<body>
+  <div class="bgfx"></div>
+  <div class="scanline"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <span class="brand-handle" id="brandHandle">@saidxon-ops</span>
+      </div>
+      <nav class="navlinks">
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a id="resumeLink" class="cta" href="#">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Resume</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section>
+    <div class="container hero">
+      <div>
+        <div class="glitch-wrap">
+          <span class="glitch-base" id="nameBase">Saidxon Xaydarov</span>
+          <span class="glitch-cyan" id="nameCyan">Saidxon Xaydarov</span>
+          <span class="glitch-fuchsia" id="nameFuchsia">Saidxon Xaydarov</span>
+        </div>
+        <div class="location" id="location">Tashkent, UZ</div>
+        <h2 class="headline" id="headline">Offensive Security • Python/Django • OSINT & Automation</h2>
+        <p class="bio" id="bio">I build secure, elegant systems; break them to make them stronger; and ship fast. Currently crafting tools for web pentesting, Telegram automation, and AI‑assisted OSINT.</p>
+        <div class="herobtns">
+          <a href="#projects" class="btn-primary">View Projects</a>
+          <a href="#contact" class="btn-secondary">Contact</a>
+        </div>
+        <div class="socials">
+          <a id="githubLink" aria-label="GitHub" href="#" title="GitHub">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.71.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.36-3.37-1.36-.46-1.2-1.12-1.52-1.12-1.52-.92-.64.07-.63.07-.63 1.02.07 1.55 1.07 1.55 1.07.9 1.58 2.36 1.12 2.94.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.05a9.2 9.2 0 0 1 5 0c1.91-1.32 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.07.36.32.67.95.67 1.92 0 1.39-.01 2.51-.01 2.85 0 .27.18.59.69.49A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
+          </a>
+          <a id="linkedinLink" aria-label="LinkedIn" href="#" title="LinkedIn">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.94 6.5a1.94 1.94 0 1 1 0-3.88 1.94 1.94 0 0 1 0 3.88zM3.89 21.25h6.1V9.28h-6.1v11.97zM13.58 9.28h-5.6v11.97h5.6v-6.7c0-3.7 4.77-4 4.77 0v6.7h5.62v-7.77c0-7.56-8.66-7.28-10.39-3.56V9.28z"/></svg>
+          </a>
+          <a id="telegramLink" aria-label="Telegram" href="#" title="Telegram">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.28 8.9 18.8c.36 0 .51-.16.7-.35l1.68-1.6 3.48 2.55c.64.35 1.11.16 1.29-.6l2.33-10.93c.21-.97-.35-1.35-.98-1.12L3.7 10.1c-.95.37-.94.9-.16 1.13l4.05 1.26 9.39-5.92c.44-.28.84-.13.51.15l-8.45 7.56z"/></svg>
+          </a>
+          <a id="emailLink" aria-label="Email" href="#" title="Email">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="terminal" id="terminal">
+          <div class="term-title">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span style="margin-left:8px; font-size:12px; color: var(--muted)">/bin/zsh — portfolio.log</span>
+          </div>
+          <pre id="termBody"></pre>
+        </div>
+        <div class="space"></div>
+        <div class="grid cols-3" id="skillGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects">
+    <div class="container">
+      <div class="sec-header">
+        <h3 style="font-size: 24px; font-weight: 600;">Featured Projects (soon active)</h3>
+        <span class="muted-tag">/projects</span>
+      </div>
+      <div class="grid cols-2 cols-3" id="projectGrid"></div>
+    </div>
+  </section>
+
+  <!-- Skills / Capabilities -->
+  <section id="skills">
+    <div class="container">
+      <div class="sec-header">
+        <h3 style="font-size: 24px; font-weight: 600;">Capabilities</h3>
+        <span class="muted-tag">/stack</span>
+      </div>
+      <div class="grid cols-2 cols-3" id="capGrid"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact">
+        <div class="row" style="justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <div>
+            <div style="font-size:22px; font-weight:600;">Let’s build securely.</div>
+            <p style="margin-top:6px; color: var(--muted); max-width: 60ch;">Open for freelance, audits, and collabs. I respond within 24h.</p>
+          </div>
+          <div class="row" style="flex-wrap: wrap;">
+            <a id="emailCta" class="btn-primary" href="#">Email me</a>
+            <a id="githubCta" class="btn-secondary" href="#" style="margin-left:8px;">GitHub</a>
+            <a id="linkedinCta" class="btn-secondary" href="#" style="margin-left:8px;">LinkedIn</a>
+            <a id="telegramCta" class="btn-secondary" href="#" style="margin-left:8px;">Telegram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container" id="copyright">© 2025 Saidxon Xaydarov. Built with love, coffee, and secure defaults.</div>
+  </footer>
+
+  <script>
+    // ------------------ Editable Profile Data ------------------
+    const PROFILE = {
+      name: "Saidxon Xaydarov",
+      handle: "@saidxon-ops",
+      headline: "Offensive Security • Python/Django • OSINT & Automation",
+      location: "Tashkent, UZ",
+      bio: "I build secure, elegant systems; break them to make them stronger; and ship fast. Currently crafting tools for web pentesting, Telegram automation, and AI‑assisted OSINT.",
+      email: "saidxon3105@gmail.com",
+      socials: {
+        github: "https://github.com/khdrvss",
+        linkedin: "https://www.linkedin.com/in/saidxon-xaydarov-5a995a2a9/",
+        telegram: "https://t.me/khdrvss",
+      },
+      resumeUrl: "#" // Put your CV/Resume link here
+    };
+
+    const PROJECTS = [
+      {
+        title: "Fikrly.uz — Reviews Platform",
+        desc: "Trustpilot-style platform for Uzbekistan. Django + Postgres + Cloudflare Tunnels. Focus on anti‑spam and fraud detection.",
+        tags: ["Django", "Postgres", "CF Tunnel", "Redis"],
+        link: "https://fikrly.uz"
+      },
+      {
+        title: "Aqilbek AI — Telegram Assistant",
+        desc: "Local+cloud AI bot that summarizes, routes, and moderates community content. Make/Zapier pipelines with approval flows.",
+        tags: ["Telegram", "LLaMA", "Make.com", "FastAPI"],
+        link: "https://t.me/aqilbek_ai"
+      },
+      {
+        title: "OSINT Hunter",
+        desc: "Telethon scanner that discovers public groups & traces entities across footprints. Built-in rate control & safe logging.",
+        tags: ["OSINT", "Telethon", "Python"],
+        link: "#"
+      },
+      {
+        title: "CTF Lab-in-a-Box",
+        desc: "Dockerized mini-CTF stack with VPN gate, scoreboard, and write‑up templates. Ready for invite‑only challenges.",
+        tags: ["Docker", "WireGuard", "CTF"],
+        link: "#"
+      }
+    ];
+
+    const SKILLS_PILLS = [
+      "Pentesting",
+      "Automation",
+      "Prompt Engineering",
+      "Python/Django",
+      "Web",
+      "Blue Team"
+    ];
+
+    const CAPABILITIES = [
+      { title: "Blue Team / Web Pentesting", pts: [
+          "Recon, auth bypass, IDOR, SSRF, SQLi, XSS",
+          "OWASP ASVS + custom checklists",
+          "Responsible, report‑first approach",
+      ]},
+      { title: "Python Tooling & Backends", pts: [
+          "Django/FastAPI services with JWT & RBAC",
+          "Async bots (Telethon, aiogram)",
+          "Task queues, Redis, Postgres",
+      ]},
+      { title: "Infra & Ops", pts: [
+          "Docker, WireGuard, Cloudflare Tunnels",
+          "Nginx hardening, TLS, rate limiting",
+          "GitHub Actions, IaC basics",
+      ]},
+    ];
+
+    // ------------------ Populate UI ------------------
+    function setEl(id, text){ const el = document.getElementById(id); if(el) el.textContent = text; }
+
+    // Brand & hero
+    setEl('brandHandle', PROFILE.handle);
+    ['nameBase','nameCyan','nameFuchsia'].forEach(id => setEl(id, PROFILE.name));
+    setEl('location', PROFILE.location);
+    setEl('headline', PROFILE.headline);
+    setEl('bio', PROFILE.bio);
+
+    // Links
+    const resumeLink = document.getElementById('resumeLink'); if(resumeLink) resumeLink.href = PROFILE.resumeUrl || '#';
+    const githubLink = document.getElementById('githubLink'); if(githubLink) githubLink.href = PROFILE.socials.github || '#';
+    const linkedinLink = document.getElementById('linkedinLink'); if(linkedinLink) linkedinLink.href = PROFILE.socials.linkedin || '#';
+    const telegramLink = document.getElementById('telegramLink'); if(telegramLink) telegramLink.href = PROFILE.socials.telegram || '#';
+    const emailLink = document.getElementById('emailLink'); if(emailLink) emailLink.href = `mailto:${PROFILE.email}`;
+
+    const emailCta = document.getElementById('emailCta'); if(emailCta) emailCta.href = `mailto:${PROFILE.email}`;
+    const githubCta = document.getElementById('githubCta'); if(githubCta) githubCta.href = PROFILE.socials.github || '#';
+    const linkedinCta = document.getElementById('linkedinCta'); if(linkedinCta) linkedinCta.href = PROFILE.socials.linkedin || '#';
+    const telegramCta = document.getElementById('telegramCta'); if(telegramCta) telegramCta.href = PROFILE.socials.telegram || '#';
+
+    // Footer
+    const copy = document.getElementById('copyright');
+    if(copy) copy.textContent = `© ${new Date().getFullYear()} ${PROFILE.name}. Built with love, coffee, and secure defaults.`;
+
+    // Skill pills under terminal
+    const skillGrid = document.getElementById('skillGrid');
+    if(skillGrid){
+      SKILLS_PILLS.forEach(txt => {
+        const pill = document.createElement('div');
+        pill.className = 'row';
+        pill.style.border = `1px solid var(--border)`;
+        pill.style.background = 'var(--panel)';
+        pill.style.borderRadius = '12px';
+        pill.style.padding = '8px 10px';
+        pill.style.color = 'rgba(255,255,255,.85)';
+        pill.style.fontSize = '14px';
+        const dot = document.createElement('span');
+        dot.className = 'dot-mini';
+        pill.appendChild(dot);
+        const label = document.createElement('span');
+        label.textContent = txt;
+        pill.appendChild(label);
+        skillGrid.appendChild(pill);
+      });
+      skillGrid.style.gridTemplateColumns = 'repeat(3, minmax(0,1fr))';
+      skillGrid.style.gap = '12px';
+    }
+
+    // Projects
+    const projectGrid = document.getElementById('projectGrid');
+    if(projectGrid){
+      PROJECTS.forEach(p => {
+        const a = document.createElement('a');
+        a.href = p.link || '#';
+        a.className = 'card';
+
+        const glow = document.createElement('div'); glow.className = 'glow'; a.appendChild(glow);
+
+        const top = document.createElement('div'); top.className = 'card-title';
+        const title = document.createElement('div'); title.textContent = p.title; top.appendChild(title);
+        const ext = document.createElement('span');
+        ext.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+        top.appendChild(ext);
+        a.appendChild(top);
+
+        const desc = document.createElement('p'); desc.className = 'card-desc'; desc.textContent = p.desc; a.appendChild(desc);
+
+        const tags = document.createElement('div'); tags.className = 'tags';
+        ;(p.tags || []).forEach(t => {
+          const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = t; tags.appendChild(tag);
+        })
+        a.appendChild(tags);
+
+        projectGrid.appendChild(a);
+      })
+      projectGrid.className = 'grid cols-2 cols-3';
+    }
+
+    // Capabilities
+    const capGrid = document.getElementById('capGrid');
+    if(capGrid){
+      CAPABILITIES.forEach(b => {
+        const box = document.createElement('div'); box.className = 'cap';
+        const t = document.createElement('div'); t.className = 'cap-title'; t.textContent = b.title; box.appendChild(t);
+        const ul = document.createElement('ul');
+        b.pts.forEach(pt => {
+          const li = document.createElement('li');
+          const d = document.createElement('span'); d.className = 'dot-mini'; li.appendChild(d);
+          const sp = document.createElement('span'); sp.textContent = pt; li.appendChild(sp);
+          ul.appendChild(li);
+        })
+        box.appendChild(ul);
+        capGrid.appendChild(box);
+      })
+      capGrid.className = 'grid cols-2 cols-3';
+    }
+
+    // Terminal typing / cycling
+    const termBody = document.getElementById('termBody');
+    const LINES = [
+      'whoami && hostname',
+      `echo \"${PROFILE.name} — ${PROFILE.headline}\"`,
+      'ls -la projects/ | head',
+      'python -m tools.autopwn --dry-run',
+      "curl -s https://api.ipify.org && echo '  # masked via wg0'",
+    ];
+
+    let idx = 0;
+    let outputs = [];
+
+    function renderTerminal(){
+      termBody.innerHTML = outputs.map(l => l).join('\n') + `\n<span class="prompt">root@${PROFILE.handle}</span><span class="dollar">:~$ </span><span class="cursor"></span>`;
+    }
+
+    function pushLine(cmd){
+      outputs.push(`<span class="prompt">root@${PROFILE.handle}</span><span class="dollar">:~$ </span><span>${cmd}</span>`);
+      if(outputs.length > 12) outputs = outputs.slice(outputs.length - 12);
+      renderTerminal();
+    }
+
+    setInterval(() => {
+      if(idx > LINES.length - 1) { idx = 0; }
+      pushLine(LINES[idx++]);
+    }, 1400);
+  </script>
+</body>
+</html>
